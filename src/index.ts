@@ -25,6 +25,20 @@ import {
 import axios from "axios";
 import { parse, print } from "graphql";
 
+// Get API key and endpoints from environment variables
+const GRAPH_API_KEY = process.env.GRAPH_API_KEY;
+const GRAPH_HOSTED_SERVICE_URL = process.env.GRAPH_HOSTED_SERVICE_URL || "https://api.thegraph.com/subgraphs/name/";
+const GRAPH_NETWORK_SUBGRAPH_URL = process.env.GRAPH_NETWORK_SUBGRAPH_URL || "https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet";
+
+// Log configuration on startup (without exposing the full API key)
+if (GRAPH_API_KEY) {
+  console.error(`Using Graph API Key: ${GRAPH_API_KEY.substring(0, 4)}...${GRAPH_API_KEY.substring(GRAPH_API_KEY.length - 4)}`);
+} else {
+  console.error("Warning: No Graph API Key found in environment variables");
+}
+console.error(`Using Graph Hosted Service URL: ${GRAPH_HOSTED_SERVICE_URL}`);
+console.error(`Using Graph Network Subgraph URL: ${GRAPH_NETWORK_SUBGRAPH_URL}`);
+
 // Define the supported networks
 const NETWORKS = [
   { id: "mainnet", name: "Ethereum Mainnet" },
