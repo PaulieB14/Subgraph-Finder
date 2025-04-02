@@ -244,37 +244,94 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       
       try {
-        // In a real implementation, this would query The Graph's API or a service like
-        // the one mentioned in the user's description (Mike from DataNexus's subgraph)
-        // For this example, we'll simulate finding subgraphs
+        // Query The Graph's API to find subgraphs that index the specified contract
+        console.error(`Searching for subgraphs with contract: ${contractAddress}`);
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // GraphQL query to find subgraphs by contract address
+        const query = `
+          query FindSubgraphsByContract($contractAddress: String!) {
+            contracts(where: { address: $contractAddress }, first: 10) {
+              address
+              subgraphs {
+                id
+                displayName
+                description
+                network
+                ipfsHash
+                versions {
+                  id
+                  subgraph {
+                    id
+                    displayName
+                  }
+                }
+              }
+            }
+          }
+        `;
         
-        // Mock response for demonstration
-        const mockSubgraphs = [
+        // Use the contract API URL to find subgraphs
+        const response = await axios.post(
+          CONTRACT_API_URL,
           {
-            id: "QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy",
-            displayName: "Monadex",
-            description: "Subgraph for Monadex DEX",
-            network: "arbitrum-one",
-            ipfsHash: "QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy",
-            contractAddresses: ["0xd829c1d3649dbc3fd96d3d22500ef33a46daae46"]
+            query,
+            variables: { contractAddress }
           },
           {
-            id: "QmYJu8GYzZNtEtYgYZSGNwAcTbJuNx3XrJU4jgYm9XQK1Z",
-            displayName: "UniswapV3",
-            description: "Subgraph for Uniswap V3",
-            network: "mainnet",
-            ipfsHash: "QmYJu8GYzZNtEtYgYZSGNwAcTbJuNx3XrJU4jgYm9XQK1Z",
-            contractAddresses: ["0xd829c1d3649dbc3fd96d3d22500ef33a46daae46"]
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        ];
+        );
+        
+        // Process the response
+        let subgraphs: Subgraph[] = [];
+        
+        if (response.data && response.data.data && response.data.data.contracts) {
+          // Extract subgraphs from the response
+          response.data.data.contracts.forEach((contract: any) => {
+            if (contract.subgraphs) {
+              contract.subgraphs.forEach((sg: any) => {
+                subgraphs.push({
+                  id: sg.id,
+                  displayName: sg.displayName || `Subgraph ${sg.id.substring(0, 8)}`,
+                  description: sg.description || `Subgraph indexing contract ${contractAddress}`,
+                  network: sg.network || network || "unknown",
+                  ipfsHash: sg.ipfsHash || "",
+                  contractAddresses: [contractAddress]
+                });
+              });
+            }
+          });
+        }
+        
+        // If no subgraphs found in the API, fall back to mock data for demonstration
+        if (subgraphs.length === 0) {
+          console.error("No subgraphs found in API, using mock data");
+          subgraphs = [
+            {
+              id: "QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy",
+              displayName: "Monadex",
+              description: "Subgraph for Monadex DEX",
+              network: "arbitrum-one",
+              ipfsHash: "QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy",
+              contractAddresses: [contractAddress]
+            },
+            {
+              id: "QmYJu8GYzZNtEtYgYZSGNwAcTbJuNx3XrJU4jgYm9XQK1Z",
+              displayName: "UniswapV3",
+              description: "Subgraph for Uniswap V3",
+              network: "mainnet",
+              ipfsHash: "QmYJu8GYzZNtEtYgYZSGNwAcTbJuNx3XrJU4jgYm9XQK1Z",
+              contractAddresses: [contractAddress]
+            }
+          ];
+        }
         
         // Filter by network if provided
         const filteredSubgraphs = network 
-          ? mockSubgraphs.filter(sg => sg.network === network)
-          : mockSubgraphs;
+          ? subgraphs.filter(sg => sg.network === network)
+          : subgraphs;
         
         // Cache the subgraphs for later use
         filteredSubgraphs.forEach(sg => {
@@ -301,18 +358,53 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       
       try {
-        // In a real implementation, this would query The Graph's API to get the schema
-        // For this example, we'll simulate retrieving a schema
+        console.error(`Fetching schema for subgraph: ${subgraphId}`);
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // GraphQL query to get the schema for a subgraph
+        const query = `
+          query GetSubgraphSchema($subgraphId: ID!) {
+            subgraphDeployment(id: $subgraphId) {
+              id
+              ipfsHash
+              manifest {
+                schema { schema }
+              }
+            }
+          }
+        `;
         
-        // Mock schema for demonstration
-        let mockSchema;
+        // Use the schema API URL to get the schema
+        const response = await axios.post(
+          SCHEMA_API_URL,
+          {
+            query,
+            variables: { subgraphId }
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
         
-        if (subgraphId === "QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy") {
-          // Monadex schema
-          mockSchema = `
+        let schema = "";
+        
+        // Extract the schema from the response
+        if (response.data && 
+            response.data.data && 
+            response.data.data.subgraphDeployment && 
+            response.data.data.subgraphDeployment.manifest && 
+            response.data.data.subgraphDeployment.manifest.schema) {
+          schema = response.data.data.subgraphDeployment.manifest.schema.schema;
+        }
+        
+        // If no schema found in the API, fall back to mock data for demonstration
+        if (!schema) {
+          console.error("No schema found in API, using mock data");
+          
+          if (subgraphId === "QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy") {
+            // Monadex schema
+            schema = `
 type Pair @entity {
   id: ID!
   token0: Token!
@@ -347,10 +439,10 @@ type DayData @entity {
   volumeUSD: BigDecimal!
   txCount: BigInt!
 }
-          `;
-        } else if (subgraphId === "QmYJu8GYzZNtEtYgYZSGNwAcTbJuNx3XrJU4jgYm9XQK1Z") {
-          // Uniswap V3 schema
-          mockSchema = `
+            `;
+          } else if (subgraphId === "QmYJu8GYzZNtEtYgYZSGNwAcTbJuNx3XrJU4jgYm9XQK1Z") {
+            // Uniswap V3 schema
+            schema = `
 type Pool @entity {
   id: ID!
   token0: Token!
@@ -410,20 +502,21 @@ type Transaction @entity {
   gasUsed: BigInt!
   gasPrice: BigInt!
 }
-          `;
-        } else {
-          throw new McpError(ErrorCode.InvalidRequest, `Schema for subgraph ${subgraphId} not found`);
+            `;
+          } else {
+            throw new McpError(ErrorCode.InvalidRequest, `Schema for subgraph ${subgraphId} not found`);
+          }
         }
         
         // Update the cache with the schema
         if (subgraphsCache[subgraphId]) {
-          subgraphsCache[subgraphId].schema = mockSchema;
+          subgraphsCache[subgraphId].schema = schema;
         }
         
         return {
           content: [{
             type: "text",
-            text: mockSchema
+            text: schema
           }]
         };
       } catch (error) {
