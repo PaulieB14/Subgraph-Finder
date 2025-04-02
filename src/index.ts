@@ -29,6 +29,14 @@ import { parse, print } from "graphql";
 const GRAPH_API_KEY = process.env.GRAPH_API_KEY;
 const GRAPH_HOSTED_SERVICE_URL = process.env.GRAPH_HOSTED_SERVICE_URL || "https://api.thegraph.com/subgraphs/name/";
 const GRAPH_NETWORK_SUBGRAPH_URL = process.env.GRAPH_NETWORK_SUBGRAPH_URL || "https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet";
+const GRAPH_GATEWAY_URL = process.env.GRAPH_GATEWAY_URL || "https://gateway.thegraph.com/api/";
+const GRAPH_SCHEMA_SUBGRAPH_ID = process.env.GRAPH_SCHEMA_SUBGRAPH_ID || "DZz4kDTdmzWLWsV373w2bSmoar3umKKH9y82SUKr5qmp";
+const GRAPH_CONTRACT_SUBGRAPH_ID = process.env.GRAPH_CONTRACT_SUBGRAPH_ID || "FMTUN6d7sY2bLnAmNEPJTqiU3iuQht6ZXurpBh71wbWR";
+const DASHBOARD_URL = process.env.DASHBOARD_URL || "https://subgraph-search-by-contract.vercel.app";
+
+// Construct full API URLs
+const SCHEMA_API_URL = `${GRAPH_GATEWAY_URL}${GRAPH_API_KEY}/subgraphs/id/${GRAPH_SCHEMA_SUBGRAPH_ID}`;
+const CONTRACT_API_URL = `${GRAPH_GATEWAY_URL}${GRAPH_API_KEY}/subgraphs/id/${GRAPH_CONTRACT_SUBGRAPH_ID}`;
 
 // Log configuration on startup (without exposing the full API key)
 if (GRAPH_API_KEY) {
@@ -38,6 +46,9 @@ if (GRAPH_API_KEY) {
 }
 console.error(`Using Graph Hosted Service URL: ${GRAPH_HOSTED_SERVICE_URL}`);
 console.error(`Using Graph Network Subgraph URL: ${GRAPH_NETWORK_SUBGRAPH_URL}`);
+console.error(`Using Schema API URL: ${GRAPH_API_KEY ? SCHEMA_API_URL.replace(GRAPH_API_KEY, "[api-key]") : SCHEMA_API_URL}`);
+console.error(`Using Contract API URL: ${GRAPH_API_KEY ? CONTRACT_API_URL.replace(GRAPH_API_KEY, "[api-key]") : CONTRACT_API_URL}`);
+console.error(`Using Dashboard URL: ${DASHBOARD_URL}`);
 
 // Define the supported networks
 const NETWORKS = [
