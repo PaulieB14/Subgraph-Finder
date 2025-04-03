@@ -116,12 +116,28 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   // Handle network resources
   if (url.pathname.startsWith('/network/')) {
     const networkId = url.pathname.replace('/network/', '');
+    console.error(`Requested network: ${networkId}`);
+    
     const network = NETWORKS.find(n => n.id === networkId);
     
     if (!network) {
-      throw new McpError(ErrorCode.InvalidRequest, `Network ${networkId} not found`);
+      console.error(`Network not found: ${networkId}`);
+      // Instead of throwing an error, return an empty network
+      return {
+        contents: [{
+          uri: request.params.uri,
+          mimeType: "application/json",
+          text: JSON.stringify({ 
+            network: { 
+              id: networkId, 
+              name: `Unknown Network (${networkId})` 
+            } 
+          }, null, 2)
+        }]
+      };
     }
     
+    console.error(`Found network: ${network.name}`);
     return {
       contents: [{
         uri: request.params.uri,
