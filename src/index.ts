@@ -97,14 +97,16 @@ const server = new Server(
  * Handler for listing available subgraphs as resources
  */
 server.setRequestHandler(ListResourcesRequestSchema, async () => {
-  // For simplicity, we'll just expose networks as resources
+  // Expose a single resource for networks instead of individual networks
   return {
-    resources: NETWORKS.map(network => ({
-      uri: `subgraph://network/${network.id}`,
-      mimeType: "application/json",
-      name: network.name,
-      description: `Subgraphs on ${network.name}`
-    }))
+    resources: [
+      {
+        uri: `subgraph://networks`,
+        mimeType: "application/json",
+        name: "Networks",
+        description: "All networks that subgraphs can index"
+      }
+    ]
   };
 });
 
@@ -114,36 +116,14 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   const url = new URL(request.params.uri);
   
-  // Handle network resources
-  if (url.pathname.startsWith('/network/')) {
-    const networkId = url.pathname.replace('/network/', '');
-    console.error(`Requested network: ${networkId}`);
-    
-    const network = NETWORKS.find(n => n.id === networkId);
-    
-    if (!network) {
-      console.error(`Network not found: ${networkId}`);
-      // Instead of throwing an error, return an empty network
-      return {
-        contents: [{
-          uri: request.params.uri,
-          mimeType: "application/json",
-          text: JSON.stringify({ 
-            network: { 
-              id: networkId, 
-              name: `Unknown Network (${networkId})` 
-            } 
-          }, null, 2)
-        }]
-      };
-    }
-    
-    console.error(`Found network: ${network.name}`);
+  // Handle networks resource (all networks in one resource)
+  if (url.pathname === '/networks' || request.params.uri === 'subgraph://networks') {
+    console.error(`Requested all networks: ${request.params.uri}`);
     return {
       contents: [{
         uri: request.params.uri,
         mimeType: "application/json",
-        text: JSON.stringify({ network }, null, 2)
+        text: JSON.stringify({ networks: NETWORKS }, null, 2)
       }]
     };
   }
