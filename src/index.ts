@@ -50,7 +50,8 @@ console.error(`Using Schema API URL: ${GRAPH_API_KEY ? SCHEMA_API_URL.replace(GR
 console.error(`Using Contract API URL: ${GRAPH_API_KEY ? CONTRACT_API_URL.replace(GRAPH_API_KEY, "[api-key]") : CONTRACT_API_URL}`);
 console.error(`Using Dashboard URL: ${DASHBOARD_URL}`);
 
-// Define the supported networks
+// Define the supported networks that subgraphs can index
+// Note: All subgraphs are hosted on Arbitrum, but they index data from various networks
 const NETWORKS = [
   { id: "mainnet", name: "Ethereum Mainnet" },
   { id: "arbitrum-one", name: "Arbitrum One" },
