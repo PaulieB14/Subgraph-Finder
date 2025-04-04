@@ -51,7 +51,16 @@ This guide provides step-by-step instructions to get the Subgraph Finder standal
 
    This will check if the server is running and provide instructions for testing with Roo Code.
 
-2. **Test with curl**
+2. **Try the chat interface**
+
+   ```bash
+   cd standalone
+   npm run dashboard
+   ```
+
+   This will open the chat interface in your default web browser, where you can interact with the Subgraph Finder using natural language.
+
+3. **Test with curl**
 
    ```bash
    # List all networks

@@ -114,7 +114,13 @@ For detailed instructions on how to test both the MCP server and the standalone 
 
 ## Usage with Gemini and Roo Code
 
-The standalone server can be used with Gemini and Roo Code to provide subgraph finding capabilities to your AI assistant. See the [Standalone Server README](./standalone/README.md) for detailed instructions on setting up and using the standalone server with Roo Code.
+The standalone server can be used with Gemini and Roo Code to provide subgraph finding capabilities to your AI assistant in two ways:
+
+1. **Chat Interface**: A conversational chat interface powered by Gemini and Roo Code that allows users to interact with the Subgraph Finder using natural language. This provides a user-friendly way to find subgraphs without needing to understand the API details.
+
+2. **API Integration**: Direct integration with Gemini through Roo Code's API capabilities, allowing you to build custom applications that leverage the Subgraph Finder functionality.
+
+See the [Standalone Server README](./standalone/README.md) for detailed instructions on setting up and using both options.
 
 ## Available MCP Tools
 

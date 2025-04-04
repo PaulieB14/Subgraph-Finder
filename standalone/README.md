@@ -197,17 +197,23 @@ The project includes several examples and tools to help you get started:
    - **roo-code-example.js**: A sample configuration for using the API with Gemini and Roo Code
    - **test-local-roo.js**: A script to test with local Roo Code installation
 
-2. **Dashboard**:
-   A web-based dashboard for testing the API is available in the `dashboard` directory.
+2. **Chat Interface**:
+   A conversational chat interface powered by Gemini and Roo Code is available in the `dashboard` directory.
    
-   To use the dashboard:
+   To use the chat interface:
    ```bash
    npm run dashboard
    ```
    
-   This will start a simple HTTP server on port 8080 and open the dashboard in your default web browser.
+   This will start a simple HTTP server and open the chat interface in your default web browser.
    
-   See the [Dashboard README](./dashboard/README.md) for more details.
+   The chat interface allows users to:
+   - Ask questions about networks in The Graph ecosystem
+   - Find subgraphs that index specific contract addresses
+   - Get schemas for subgraphs
+   - Match their intent with available subgraphs using natural language
+   
+   See the [Chat Interface README](./dashboard/README.md) for more details.
 
 ## License
 
