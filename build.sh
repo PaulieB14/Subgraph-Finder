@@ -18,13 +18,15 @@ npm run build
 
 # Create necessary directories
 echo "Creating output directories..."
-mkdir -p dist
+mkdir -p ../public/api
+mkdir -p ../public/dashboard
 
-# Ensure the dashboard directory exists
-if [ ! -d "dist/dashboard" ]; then
-  echo "Copying dashboard files..."
-  mkdir -p dist/dashboard
-  cp -r dashboard/* dist/dashboard/
-fi
+# Copy API files
+echo "Copying API files..."
+cp -r dist/* ../public/api/
+
+# Copy dashboard files
+echo "Copying dashboard files..."
+cp -r dashboard/* ../public/dashboard/
 
 echo "Build completed successfully!"

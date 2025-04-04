@@ -1,40 +1,11 @@
 {
   "version": 2,
   "buildCommand": "bash build.sh",
-  "builds": [
-    {
-      "src": "standalone/dist/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "standalone/dashboard/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "standalone/dist/index.js"
-    },
-    {
-      "src": "/dashboard/chat",
-      "dest": "standalone/dashboard/chat.html"
-    },
-    {
-      "src": "/dashboard/(.*)",
-      "dest": "standalone/dashboard/$1"
-    },
-    {
-      "src": "/chat",
-      "dest": "standalone/dashboard/chat.html"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|svg|ico))",
-      "dest": "standalone/dashboard/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "standalone/dashboard/index.html"
-    }
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/chat", "destination": "/dashboard/chat.html" },
+    { "source": "/dashboard/chat", "destination": "/dashboard/chat.html" },
+    { "source": "/", "destination": "/dashboard/index.html" }
   ]
 }
