@@ -802,4 +802,19 @@ export async function matchIntent(intent: string, network?: string): Promise<Mat
       };
     }
     
+// Around line 806, complete the matchIntent function and add closing braces
+
     // Get available subgraphs
+    // Implement the rest of the matchIntent function here
+    return {
+      matches: [],
+      recommendation: "Implementation pending. Check back soon for intelligent subgraph matching."
+    };
+  } catch (error) {
+    console.error("Error matching intent:", error);
+    return {
+      matches: [],
+      recommendation: "Error occurred while matching intent. Please try again later."
+    };
+  }
+}
