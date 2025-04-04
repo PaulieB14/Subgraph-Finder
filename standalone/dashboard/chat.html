@@ -390,7 +390,7 @@
             <h3>API Configuration</h3>
             <div class="form-group">
                 <label for="api-url">API URL</label>
-                <input type="text" id="api-url" value="http://localhost:3002/api">
+                <input type="text" id="api-url" value="/api">
             </div>
         </div>
         
@@ -421,7 +421,7 @@
             
             // Settings
             let settings = {
-                apiUrl: localStorage.getItem('apiUrl') || 'http://localhost:3002/api',
+                apiUrl: localStorage.getItem('apiUrl') || '/api',
                 rooApiKey: localStorage.getItem('rooApiKey') || ''
             };
             
