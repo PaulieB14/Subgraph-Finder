@@ -48,6 +48,21 @@ npm install
 npm run build
 ```
 
+## Available Implementations
+
+This repository contains two implementations of the Subgraph Finder:
+
+1. **MCP Server**: A Model Context Protocol server for use with Claude and other MCP-compatible AI assistants.
+2. **Standalone Server**: A standalone HTTP server that can be used with any client, including Gemini with Roo Code.
+
+### MCP Server
+
+The MCP server is located in the root directory and is designed to be used with Claude Desktop or other MCP-compatible AI assistants.
+
+### Standalone Server
+
+The standalone server is located in the `standalone` directory and provides an HTTP API for the Subgraph Finder functionality. See the [Standalone Server README](./standalone/README.md) for more details or the [Quickstart Guide](./standalone/QUICKSTART.md) for a quick setup.
+
 ## Configuration
 
 The server can be configured using environment variables:
@@ -59,6 +74,10 @@ The server can be configured using environment variables:
 - `GRAPH_SCHEMA_SUBGRAPH_ID`: ID of the subgraph that provides schema information
 - `GRAPH_CONTRACT_SUBGRAPH_ID`: ID of the subgraph that provides contract information
 - `DASHBOARD_URL`: URL for the subgraph search dashboard
+
+## Testing
+
+For detailed instructions on how to test both the MCP server and the standalone server, see the [Testing Guide](./TESTING.md).
 
 ## Usage with Claude Desktop
 
@@ -93,7 +112,11 @@ The server can be configured using environment variables:
    - "Get the schema for subgraph QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy"
    - "I want trading volume and liquidity for a DEX on Arbitrum"
 
-## Available Tools
+## Usage with Gemini and Roo Code
+
+The standalone server can be used with Gemini and Roo Code to provide subgraph finding capabilities to your AI assistant. See the [Standalone Server README](./standalone/README.md) for detailed instructions on setting up and using the standalone server with Roo Code.
+
+## Available MCP Tools
 
 ### list_networks
 
@@ -138,21 +161,22 @@ Example usage:
 
 ### Project Structure
 
-- `src/index.ts`: Main server implementation
-- `build/index.js`: Compiled JavaScript server
+- `src/index.ts`: Main MCP server implementation
+- `build/index.js`: Compiled JavaScript MCP server
 - `examples/use-subgraph-finder.js`: Example usage script
 - `package.json`: Project dependencies and scripts
 - `tsconfig.json`: TypeScript configuration
+- `standalone/`: Standalone HTTP server implementation
 
 ### Available Scripts
 
-- `npm run build`: Build the project
+- `npm run build`: Build the MCP server
 - `npm run watch`: Watch for changes and rebuild
 - `npm run inspector`: Run the MCP inspector for debugging
 
 ### Running the Example Script
 
-To see all the functionality in action:
+To see all the functionality of the MCP server in action:
 
 ```bash
 cd examples
@@ -177,3 +201,4 @@ MIT
 
 - [The Graph](https://thegraph.com/) for creating an amazing decentralized indexing protocol
 - [Model Context Protocol](https://modelcontextprotocol.io/) for enabling tool integration with Claude
+- [Roo Code](https://docs.roocode.com/) for enabling tool integration with Gemini

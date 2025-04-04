@@ -1,0 +1,73 @@
+{
+  "tools": [
+    {
+      "name": "subgraph-finder",
+      "description": "Find the right subgraph in The Graph ecosystem based on your needs",
+      "api": {
+        "type": "openapi",
+        "url": "http://localhost:3000/api",
+        "endpoints": [
+          {
+            "path": "/networks",
+            "method": "GET",
+            "description": "List all available networks in The Graph ecosystem"
+          },
+          {
+            "path": "/subgraphs/contract/{address}",
+            "method": "GET",
+            "description": "Find subgraphs that index a specific contract address",
+            "parameters": [
+              {
+                "name": "address",
+                "description": "Ethereum contract address (e.g., 0xd829c1d3649dbc3fd96d3d22500ef33a46daae46)"
+              },
+              {
+                "name": "network",
+                "description": "Network ID (e.g., mainnet, arbitrum-one)",
+                "required": false
+              }
+            ]
+          },
+          {
+            "path": "/subgraphs/{id}/schema",
+            "method": "GET",
+            "description": "Get the schema for a specific subgraph",
+            "parameters": [
+              {
+                "name": "id",
+                "description": "ID of the subgraph"
+              }
+            ]
+          },
+          {
+            "path": "/match",
+            "method": "POST",
+            "description": "Match user intent with available subgraphs",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "intent": {
+                        "type": "string",
+                        "description": "User's intent (e.g., 'I want trading volume and liquidity for a DEX on Arbitrum')"
+                      },
+                      "network": {
+                        "type": "string",
+                        "description": "Optional network ID to filter by"
+                      }
+                    },
+                    "required": [
+                      "intent"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

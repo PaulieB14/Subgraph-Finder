@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subgraph Finder Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        .card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        pre {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .result {
+            margin-top: 20px;
+            display: none;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f1f1f1;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Subgraph Finder Dashboard</h1>
+    <p>Use this dashboard to test the Subgraph Finder API endpoints.</p>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="networks">Networks</div>
+        <div class="tab" data-tab="contracts">Find by Contract</div>
+        <div class="tab" data-tab="schema">Get Schema</div>
+        <div class="tab" data-tab="match">Match Intent</div>
+    </div>
+
+    <div class="tab-content active" id="networks-tab">
+        <div class="card">
+            <h2>List Networks</h2>
+            <p>Get a list of all available networks in The Graph ecosystem.</p>
+            <button id="list-networks-btn">List Networks</button>
+            <div class="result" id="networks-result">
+                <h3>Result:</h3>
+                <pre id="networks-output"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="contracts-tab">
+        <div class="card">
+            <h2>Find Subgraphs by Contract</h2>
+            <p>Find subgraphs that index a specific contract address.</p>
+            <div class="form-group">
+                <label for="contract-address">Contract Address:</label>
+                <input type="text" id="contract-address" placeholder="e.g., 0xd829c1d3649dbc3fd96d3d22500ef33a46daae46">
+            </div>
+            <div class="form-group">
+                <label for="contract-network">Network (optional):</label>
+                <select id="contract-network">
+                    <option value="">All Networks</option>
+                    <!-- Networks will be populated dynamically -->
+                </select>
+            </div>
+            <button id="find-contract-btn">Find Subgraphs</button>
+            <div class="result" id="contract-result">
+                <h3>Result:</h3>
+                <pre id="contract-output"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="schema-tab">
+        <div class="card">
+            <h2>Get Subgraph Schema</h2>
+            <p>Get the schema for a specific subgraph.</p>
+            <div class="form-group">
+                <label for="subgraph-id">Subgraph ID:</label>
+                <input type="text" id="subgraph-id" placeholder="e.g., QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy">
+            </div>
+            <button id="get-schema-btn">Get Schema</button>
+            <div class="result" id="schema-result">
+                <h3>Result:</h3>
+                <pre id="schema-output"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="match-tab">
+        <div class="card">
+            <h2>Match Intent</h2>
+            <p>Match user intent with available subgraphs.</p>
+            <div class="form-group">
+                <label for="intent">Intent:</label>
+                <textarea id="intent" rows="3" placeholder="e.g., I want trading volume and liquidity for a DEX on Arbitrum"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="intent-network">Network (optional):</label>
+                <select id="intent-network">
+                    <option value="">All Networks</option>
+                    <!-- Networks will be populated dynamically -->
+                </select>
+            </div>
+            <button id="match-intent-btn">Match Intent</button>
+            <div class="result" id="match-result">
+                <h3>Result:</h3>
+                <pre id="match-output"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API base URL
+        const API_BASE_URL = 'http://localhost:3002/api';
+
+        // Helper function to make API requests
+        async function makeRequest(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                return await response.json();
+            } catch (error) {
+                console.error(`Error making request to ${endpoint}:`, error);
+                return { error: error.message };
+            }
+        }
+
+        // Function to display results
+        function displayResult(elementId, data) {
+            const resultElement = document.getElementById(`${elementId}-result`);
+            const outputElement = document.getElementById(`${elementId}-output`);
+            
+            resultElement.style.display = 'block';
+            outputElement.textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+
+        // Load networks and populate dropdowns
+        async function loadNetworks() {
+            try {
+                const result = await makeRequest('/networks');
+                if (result.networks) {
+                    const networkDropdowns = document.querySelectorAll('#contract-network, #intent-network');
+                    
+                    networkDropdowns.forEach(dropdown => {
+                        // Clear existing options except the first one
+                        while (dropdown.options.length > 1) {
+                            dropdown.remove(1);
+                        }
+                        
+                        // Add network options
+                        result.networks.forEach(network => {
+                            const option = document.createElement('option');
+                            option.value = network.id;
+                            option.textContent = network.name;
+                            dropdown.appendChild(option);
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading networks:', error);
+            }
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load networks
+            loadNetworks();
+            
+            // List Networks
+            document.getElementById('list-networks-btn').addEventListener('click', async () => {
+                const result = await makeRequest('/networks');
+                displayResult('networks', result);
+            });
+            
+            // Find by Contract
+            document.getElementById('find-contract-btn').addEventListener('click', async () => {
+                const contractAddress = document.getElementById('contract-address').value.trim();
+                const network = document.getElementById('contract-network').value;
+                
+                if (!contractAddress) {
+                    alert('Please enter a contract address');
+                    return;
+                }
+                
+                let endpoint = `/subgraphs/contract/${contractAddress}`;
+                if (network) {
+                    endpoint += `?network=${network}`;
+                }
+                
+                const result = await makeRequest(endpoint);
+                displayResult('contract', result);
+            });
+            
+            // Get Schema
+            document.getElementById('get-schema-btn').addEventListener('click', async () => {
+                const subgraphId = document.getElementById('subgraph-id').value.trim();
+                
+                if (!subgraphId) {
+                    alert('Please enter a subgraph ID');
+                    return;
+                }
+                
+                const result = await makeRequest(`/subgraphs/${subgraphId}/schema`);
+                displayResult('schema', result);
+            });
+            
+            // Match Intent
+            document.getElementById('match-intent-btn').addEventListener('click', async () => {
+                const intent = document.getElementById('intent').value.trim();
+                const network = document.getElementById('intent-network').value;
+                
+                if (!intent) {
+                    alert('Please enter an intent');
+                    return;
+                }
+                
+                const data = { intent };
+                if (network) {
+                    data.network = network;
+                }
+                
+                const result = await makeRequest('/match', 'POST', data);
+                displayResult('match', result);
+            });
+        });
+    </script>
+</body>
+</html>
