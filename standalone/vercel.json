@@ -1,19 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build && mkdir -p public/api && cp -r dist/* public/api/ && mkdir -p public/dashboard && cp -r dashboard/* public/dashboard/",
-  "outputDirectory": "public",
-  "rewrites": [
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "dist/index.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/dashboard/index.html"
-    },
-    {
-      "source": "/",
-      "destination": "/index.html"
+      "src": "/api/(.*)",
+      "dest": "/dist/index.js"
     }
   ]
 }
