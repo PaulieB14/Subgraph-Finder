@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subgraph Finder Chat - Simple Version</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --background-color: #f9f9f9;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #ddd;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --user-message-bg: #e1f5fe;
+            --ai-message-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 250px);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background-color: var(--user-message-bg);
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .ai-message {
+            background-color: var(--ai-message-bg);
+            align-self: flex-start;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-content {
+            word-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--light-text);
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: var(--card-background);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .chat-input button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .chat-input button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .chat-input button:disabled {
+            background-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin: 40px 0;
+            color: var(--light-text);
+        }
+
+        .welcome-message h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .welcome-message p {
+            margin-bottom: 15px;
+        }
+
+        .example-queries {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .example-query {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .example-query:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .chat-input {
+                padding: 10px;
+            }
+            
+            .chat-input input {
+                padding: 10px;
+            }
+            
+            .chat-input button {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Subgraph Finder Chat - Simple Version</h1>
+        <div class="subtitle">Static Demo Version</div>
+    </header>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    <h2>Welcome to Subgraph Finder Chat!</h2>
+                    <p>This is a simplified static version for testing.</p>
+                    <p>Try these example queries:</p>
+                    <div class="example-queries">
+                        <div class="example-query" id="query1">List all networks in The Graph ecosystem</div>
+                        <div class="example-query" id="query2">Find subgraphs that index contract 0xd829c1d3649dbc3fd96d3d22500ef33a46daae46</div>
+                        <div class="example-query" id="query3">Get schema for subgraph QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy</div>
+                        <div class="example-query" id="query4">I want trading volume and liquidity for a DEX on Arbitrum</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="Type your message here..." autocomplete="off">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const chatMessages = document.getElementById('chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const exampleQueries = document.querySelectorAll('.example-query');
+            
+            // Event Listeners
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            sendButton.addEventListener('click', sendMessage);
+            
+            exampleQueries.forEach(query => {
+                query.addEventListener('click', function() {
+                    messageInput.value = this.textContent;
+                    sendMessage();
+                });
+            });
+            
+            // Functions
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+                
+                // Add user message to chat
+                addMessage(message, 'user');
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // Simulate AI response
+                setTimeout(() => {
+                    let response = '';
+                    
+                    if (message.toLowerCase().includes('list all networks') || 
+                        message.toLowerCase().includes('show networks')) {
+                        response = `Here are the available networks in The Graph ecosystem:
+
+1. Ethereum Mainnet (mainnet)
+2. Arbitrum One (arbitrum-one)
+3. Optimism (optimism)
+4. Polygon (matic)
+5. Base (base)
+6. Avalanche (avalanche)
+7. Celo (celo)
+8. Gnosis Chain (gnosis)`;
+                    }
+                    else if (message.toLowerCase().includes('find subgraphs') && 
+                             message.toLowerCase().includes('contract')) {
+                        response = `Found 1 subgraph(s) for this contract:
+
+1. Uniswap V3
+   ID: QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy
+   Network: mainnet
+   Description: Indexes Uniswap V3 contract data
+`;
+                    }
+                    else if (message.toLowerCase().includes('get schema') && 
+                             message.toLowerCase().includes('subgraph')) {
+                        response = `Here's the schema for this subgraph:
+
+This schema contains entities for a decentralized exchange
+
+Raw Schema:
+\`\`\`
+type Token @entity {
+  id: ID!
+  symbol: String!
+  name: String!
+}
+\`\`\``;
+                    }
+                    else if (message.toLowerCase().includes('trading volume') || 
+                             message.toLowerCase().includes('liquidity') || 
+                             message.toLowerCase().includes('dex')) {
+                        response = `I found a subgraph that might help with your query.
+
+Found 1 matching subgraph(s):
+
+1. Uniswap V3 (85% match)
+   ID: QmXKwSEMirgWVn41nRzkT3hpUBw29cp619Gx1BfmLvPNGy
+   Network: arbitrum-one
+   This subgraph indexes trading data for Uniswap V3
+
+   Sample Query:
+   \`\`\`
+   {
+     pools(first: 10) {
+       id
+       token0 {
+         symbol
+       }
+       token1 {
+         symbol
+       }
+       volumeUSD
+     }
+   }
+   \`\`\`
+`;
+                    }
+                    else {
+                        response = "I'm sorry, I don't have enough information to answer that query. Please try one of the example queries or ask about subgraphs, networks, or contracts in The Graph ecosystem.";
+                    }
+                    
+                    addMessage(response, 'ai');
+                }, 1000);
+            }
+            
+            function addMessage(content, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${sender}-message`;
+                
+                // Format the content (handle code blocks, etc.)
+                const formattedContent = formatMessage(content);
+                
+                messageElement.innerHTML = `
+                    <div class="message-content">${formattedContent}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString()}</div>
+                `;
+                
+                // Remove welcome message if it exists
+                const welcomeMessage = document.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    chatMessages.removeChild(welcomeMessage);
+                }
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function formatMessage(content) {
+                // Replace code blocks
+                content = content.replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
+                
+                // Replace inline code
+                content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
+                
+                // Replace URLs with links
+                content = content.replace(
+                    /(https?:\/\/[^\s]+)/g, 
+                    '<a href="$1" target="_blank">$1</a>'
+                );
+                
+                // Replace line breaks
+                content = content.replace(/\n/g, '<br>');
+                
+                return content;
+            }
+        });
+    </script>
+</body>
+</html>
