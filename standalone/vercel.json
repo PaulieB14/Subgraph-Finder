@@ -1,11 +1,19 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "npm install && npm run build && mkdir -p ../public/api && cp -r dist/* ../public/api/ && mkdir -p ../public/dashboard && cp -r dashboard/* ../public/dashboard/",
+  "outputDirectory": "../public",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/dist/index.js"
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dashboard/$1"
+    },
+    {
+      "source": "/",
+      "destination": "/dashboard/index.html"
     }
   ]
 }
