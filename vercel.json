@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd standalone && npm install && npm run build && mkdir -p ../public && cp -r dist/* ../public/ && cp -r dashboard/* ../public/dashboard/",
+  "buildCommand": "cd standalone && npm install && npm run build && mkdir -p ../public && cp -r dist/* ../public/ && mkdir -p ../public/dashboard && cp -r dashboard/* ../public/dashboard/",
   "outputDirectory": "public",
   "rewrites": [
     {
