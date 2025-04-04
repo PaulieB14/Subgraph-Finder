@@ -2,23 +2,18 @@
   "version": 2,
   "buildCommand": "cd standalone && npm install && npm run build && mkdir -p ../public/dashboard && cp -r dashboard/* ../public/dashboard/",
   "outputDirectory": "public",
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/standalone/dist/index.js"
+      "source": "/api/(.*)",
+      "destination": "/standalone/dist/index.js"
     },
     {
-      "src": "/dashboard(.*)",
-      "dest": "/dashboard$1"
+      "source": "/dashboard(.*)",
+      "destination": "/dashboard$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/(.*)",
+      "destination": "/$1"
     }
   ]
 }
