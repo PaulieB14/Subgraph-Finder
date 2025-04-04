@@ -167,29 +167,38 @@ Example usage:
 
 ### Project Structure
 
-- `src/index.ts`: Main MCP server implementation
-- `build/index.js`: Compiled JavaScript MCP server
-- `examples/use-subgraph-finder.js`: Example usage script
+- `src/`: Source code for the MCP server
+  - `index.ts`: Main MCP server implementation
+- `build/`: Compiled JavaScript MCP server
+- `examples/`: Example usage scripts organized by category
+  - `basic/`: Simple examples to get started
+  - `contracts/`: Examples for finding subgraphs by contract
+  - `schemas/`: Examples for retrieving schemas
+  - `import/`: Examples showing how to import the library
+- `scripts/`: Utility scripts for development and deployment
+- `standalone/`: Standalone HTTP server implementation
+- `public/`: Static files for deployment
 - `package.json`: Project dependencies and scripts
 - `tsconfig.json`: TypeScript configuration
-- `standalone/`: Standalone HTTP server implementation
 
 ### Available Scripts
 
 - `npm run build`: Build the MCP server
 - `npm run watch`: Watch for changes and rebuild
 - `npm run inspector`: Run the MCP inspector for debugging
+- `./scripts/run-local.sh`: Run the server locally for testing
+- `./scripts/fix-and-test.sh`: Fix TypeScript errors and run tests
+- `./scripts/quick-fix.sh`: Quickly fix common issues in the codebase
 
-### Running the Example Script
+### Running the Examples
 
-To see all the functionality of the MCP server in action:
+To see the functionality of the MCP server in action, run one of the example scripts:
 
 ```bash
-cd examples
-./use-subgraph-finder.js
+node examples/basic/simple-test.js
 ```
 
-This will demonstrate all the available functionality of the Subgraph Finder MCP server, including querying statistics for the Scroll network.
+Check the [Examples README](./examples/README.md) for more information about the available examples.
 
 ## Future Enhancements
 
