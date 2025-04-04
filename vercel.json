@@ -1,11 +1,35 @@
 {
   "version": 2,
-  "buildCommand": "cd standalone && npm install && npm run build && mkdir -p ../public && cp -r dist/* ../public/ && mkdir -p ../public/dashboard && cp -r dashboard/* ../public/dashboard/",
-  "outputDirectory": "public",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/index.js"
+      "src": "standalone/dist/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "standalone/dashboard/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "standalone/dist/index.js"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "standalone/dashboard/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "public/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "public/$1"
     }
   ]
 }

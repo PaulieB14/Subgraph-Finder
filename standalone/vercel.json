@@ -1,11 +1,31 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build && mkdir -p public && cp -r dist/* public/ && mkdir -p public/dashboard && cp -r dashboard/* public/dashboard/",
-  "outputDirectory": "public",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/index.js"
+      "src": "dist/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "dashboard/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "dist/index.js"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "dashboard/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "dashboard/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "$1"
     }
   ]
 }
