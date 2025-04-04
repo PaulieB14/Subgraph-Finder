@@ -1,11 +1,23 @@
 {
   "version": 2,
-  "buildCommand": "cd standalone && npm install && npm run build && mkdir -p ../public && cp -r dist/* ../public/",
+  "buildCommand": "cd standalone && npm install && npm run build && mkdir -p ../public && cp -r dist/* ../public/ && cp -r dashboard/* ../public/dashboard/",
   "outputDirectory": "public",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/(.*)",
       "destination": "/index.js"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard/index.html"
+    },
+    {
+      "source": "/",
+      "destination": "/dashboard/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
     }
   ]
 }
