@@ -17,8 +17,16 @@
       "dest": "standalone/dist/index.js"
     },
     {
+      "src": "/dashboard/chat",
+      "dest": "standalone/dashboard/chat.html"
+    },
+    {
       "src": "/dashboard/(.*)",
       "dest": "standalone/dashboard/$1"
+    },
+    {
+      "src": "/chat",
+      "dest": "standalone/dashboard/chat.html"
     },
     {
       "src": "/(.*\\.(js|css|png|jpg|svg|ico))",
