@@ -815,6 +815,6 @@ export async function matchIntent(intent: string, network?: string): Promise<Mat
     return {
       matches: [],
       recommendation: "Error occurred while matching intent. Please try again later."
-    };
+    }
   }
 }
