@@ -783,7 +783,7 @@ export async function getSubgraphSchema(subgraphId: string): Promise<string | Sc
 }
 
 /**
- * Match user intent with available subgraphs using Gemini
+ * Match user intent with available subgraphs and generate a GraphQL query using Gemini
  */
 export async function matchIntent(intent: string, network?: string): Promise<MatchResponse> {
   if (!intent) {
@@ -798,23 +798,157 @@ export async function matchIntent(intent: string, network?: string): Promise<Mat
       console.warn("Gemini AI not initialized. Falling back to default response.");
       return {
         matches: [],
-        recommendation: "No matching subgraphs found. You may need to create a new subgraph for your specific needs. Check the documentation at https://thegraph.com/docs to learn how to build one."
+        recommendation: "No matching subgraphs found. Gemini AI is required to generate queries. Please configure the GOOGLE_AI_API_KEY environment variable."
       };
     }
     
-// Around line 806, complete the matchIntent function and add closing braces
+    // Define available subgraphs (could be expanded with findSubgraphsByContract)
+    const availableSubgraphs: Subgraph[] = [
+      {
+        id: "6ZM4U5FkFLop2Fjtaz4q8Q7zwDvEVJQhWpAPBy6vT632",
+        displayName: "uniswap-v3-optimism",
+        description: "Uniswap V3 subgraph for Optimism network",
+        network: "optimism",
+        ipfsHash: "QmNPZx4tgVfw5TFgmioXLTT1xdaz1yyyAyHwzi8jxDTvVR",
+        contractAddresses: ["0x1F98431c8aD98523631AE4a59f267346ea31F984"]
+      }
+      // Add more subgraphs here or fetch dynamically with findSubgraphsByContract
+    ];
 
-    // Get available subgraphs
-    // Implement the rest of the matchIntent function here
+    // Filter by network if provided
+    const filteredSubgraphs = network 
+      ? availableSubgraphs.filter(sg => sg.network === network)
+      : availableSubgraphs;
+
+    if (filteredSubgraphs.length === 0) {
+      console.log(`No subgraphs found for network: ${network}`);
+      return {
+        matches: [],
+        recommendation: `No subgraphs available for network "${network || 'any'}". Try a different network or create a new subgraph at https://thegraph.com/docs.`
+      };
+    }
+
+    // Fetch schemas for all subgraphs
+    console.log("Fetching schemas for available subgraphs");
+    const subgraphsWithSchemas = await Promise.all(
+      filteredSubgraphs.map(async (sg) => {
+        const schema = await getSubgraphSchema(sg.id);
+        const schemaObj = typeof schema === "string" ? { raw: schema, description: "" } : schema;
+        return { ...sg, schema: schemaObj };
+      })
+    );
+
+    // Use Gemini to match intent and generate queries
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-exp-03-25" });
+    const prompt = `
+      The user wants to query data with this intent: "${intent}"
+      Available subgraphs:
+      ${subgraphsWithSchemas.map(sg => `
+        Subgraph: ${sg.displayName} (${sg.network})
+        Description: ${sg.description}
+        Schema: ${sg.schema.raw}
+      `).join('\n')}
+
+      For each subgraph:
+      1. Assign a relevance score (0-100) based on how well it matches the intent.
+      2. If score > 50, generate a GraphQL query that satisfies the intent using the schema.
+      3. Provide a brief explanation of the match and query.
+
+      Return a JSON array of objects:
+      [
+        {
+          "id": "subgraph-id",
+          "score": number,
+          "query": "GraphQL query string or empty string if score <= 50",
+          "reason": "explanation of match and query"
+        }
+      ]
+    `;
+
+    console.log("Sending request to Gemini for intent matching and query generation");
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const matchText = response.text();
+
+    console.log("Gemini response:", matchText);
+
+    // Parse Gemini's response
+    let matches: MatchResult[] = [];
+    try {
+      const parsed = JSON.parse(matchText);
+      if (Array.isArray(parsed)) {
+        matches = parsed.map(item => {
+          const subgraph = subgraphsWithSchemas.find(sg => sg.id === item.id);
+          if (!subgraph) {
+            console.warn(`Subgraph with id ${item.id} not found in available subgraphs`);
+            return null;
+          }
+          const sampleQuery = item.query || generateSampleQuery(subgraph);
+          return {
+            subgraph,
+            confidence: item.score || 0,
+            sampleQuery
+          };
+        }).filter((m): m is NonNullable<typeof m> => m !== null) as MatchResult[];
+      } else {
+        throw new Error("Gemini response is not an array");
+      }
+    } catch (error) {
+      console.error("Error parsing Gemini response:", error);
+      // Fallback to basic matching
+      matches = subgraphsWithSchemas.map(sg => ({
+        subgraph: sg,
+        confidence: 50,
+        sampleQuery: generateSampleQuery(sg)
+      }));
+    }
+
+    // Sort matches by confidence (highest first)
+    matches.sort((a, b) => b.confidence - a.confidence);
+
+    // Generate recommendation
+    const recommendation = matches.length > 0 && matches[0].confidence > 70
+      ? `Recommended subgraph: "${matches[0].subgraph.displayName}" (confidence: ${matches[0].confidence})\nSuggested query:\n${matches[0].sampleQuery}`
+      : matches.length > 0
+        ? `Best match: "${matches[0].subgraph.displayName}" (confidence: ${matches[0].confidence}), but confidence is low. Query:\n${matches[0].sampleQuery}`
+        : "No suitable subgraphs found. You may need to create a new subgraph: https://thegraph.com/docs";
+
+    console.log("Returning matches:", matches);
     return {
-      matches: [],
-      recommendation: "Implementation pending. Check back soon for intelligent subgraph matching."
+      matches,
+      recommendation
     };
   } catch (error) {
     console.error("Error matching intent:", error);
     return {
       matches: [],
-      recommendation: "Error occurred while matching intent. Please try again later."
+      recommendation: "An error occurred while matching your intent. Please try again later."
     };
   }
+}
+
+/**
+ * Generate a sample GraphQL query for a subgraph (moved from original end of file)
+ */
+function generateSampleQuery(subgraph: Subgraph): string {
+  if (subgraph.id === "6ZM4U5FkFLop2Fjtaz4q8Q7zwDvEVJQhWpAPBy6vT632") {
+    return `{
+  pools(first: 5, orderBy: volumeUSD, orderDirection: desc) {
+    id
+    token0 {
+      symbol
+    }
+    token1 {
+      symbol
+    }
+    volumeUSD
+    feesUSD
+  }
+}`;
+  }
+  
+  return `{
+  # This is a sample query - modify based on the subgraph schema
+  # Use getSubgraphSchema() to get the full schema
+}`;
 }
