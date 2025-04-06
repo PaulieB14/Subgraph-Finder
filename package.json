@@ -1,7 +1,7 @@
 {
   "name": "subgraph-finder",
   "version": "0.1.0",
-  "description": "A Model Context Protocol server",
+  "description": "A Model Context Protocol server for finding and querying subgraphs",
   "private": true,
   "type": "module",
   "bin": {
@@ -14,15 +14,41 @@
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+    "start": "node build/index.js",
+    "dev": "npm run build && npm start",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js",
+    "validate": "npx @modelcontextprotocol/inspector build/index.js",
+    "deploy": "cd standalone && npm run build && mkdir -p ../public/api && cp -r dist/* ../public/api/ && mkdir -p ../public/dashboard && cp -r dashboard/* ../public/dashboard/",
+    "standalone": "cd standalone && npm run build && node dist/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.6.0",
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "@google/generative-ai": "^0.2.1",
     "axios": "^1.8.4",
-    "graphql": "^16.10.0"
+    "graphql": "^16.10.0",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
+    "@modelcontextprotocol/typings": "^0.6.0",
     "@types/node": "^20.11.24",
-    "typescript": "^5.3.3"
-  }
+    "typescript": "^5.3.3",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PaulieB14/Subgraph-Finder.git"
+  },
+  "keywords": [
+    "subgraph",
+    "thegraph",
+    "blockchain",
+    "mcp",
+    "model-context-protocol"
+  ],
+  "author": "Paul Barba",
+  "license": "MIT"
 }
