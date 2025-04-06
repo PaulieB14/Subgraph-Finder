@@ -8,7 +8,7 @@ import { findSubgraphsByContract, getSubgraph, getSubgraphSchema } from '../serv
 export const subgraphRoutes = express.Router();
 
 /**
- * @route   GET /api/subgraphs/contract/:address
+ * @route   GET /subgraphs/contract/:address
  * @desc    Find subgraphs by contract address
  * @access  Public
  */
@@ -34,7 +34,7 @@ subgraphRoutes.get('/contract/:address', async (req, res) => {
 });
 
 /**
- * @route   GET /api/subgraphs/:id
+ * @route   GET /subgraphs/:id
  * @desc    Get a subgraph by ID
  * @access  Public
  */
@@ -60,7 +60,7 @@ subgraphRoutes.get('/:id', (req, res) => {
 });
 
 /**
- * @route   GET /api/subgraphs/:id/schema
+ * @route   GET /subgraphs/:id/schema
  * @desc    Get the schema for a subgraph
  * @access  Public
  */

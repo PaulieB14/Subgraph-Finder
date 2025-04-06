@@ -48,9 +48,16 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/api/networks', networkRoutes);
-app.use('/api/subgraphs', subgraphRoutes);
-app.use('/api/match', matchRoutes);
+app.use('/networks', networkRoutes);
+app.use('/subgraphs', subgraphRoutes);
+app.use('/match', matchRoutes);
+
+// Handle /api prefix for Vercel deployment
+app.use('/api', (req, res, next) => {
+  // Remove /api prefix from URL
+  req.url = req.url.replace(/^\/api/, '');
+  next();
+});
 
 // Serve the dashboard
 app.use('/dashboard', express.static(path.join(__dirname, '..', 'dashboard')));
@@ -62,10 +69,10 @@ app.get('/', (req, res) => {
     version: '0.1.0',
     description: 'An API to help users find the right subgraph in The Graph ecosystem',
     endpoints: [
-      { path: '/api/networks', description: 'List all available networks' },
-      { path: '/api/subgraphs/contract/:address', description: 'Find subgraphs by contract address' },
-      { path: '/api/subgraphs/:id/schema', description: 'Get the schema for a specific subgraph' },
-      { path: '/api/match', description: 'Match user intent with available subgraphs' }
+      { path: '/networks', description: 'List all available networks' },
+      { path: '/subgraphs/contract/:address', description: 'Find subgraphs by contract address' },
+      { path: '/subgraphs/:id/schema', description: 'Get the schema for a specific subgraph' },
+      { path: '/match', description: 'Match user intent with available subgraphs' }
     ]
   });
 });

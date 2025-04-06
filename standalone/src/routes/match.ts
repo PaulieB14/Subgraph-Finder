@@ -8,7 +8,7 @@ import { matchIntent } from '../services/graph-service.js';
 export const matchRoutes = express.Router();
 
 /**
- * @route   POST /api/match
+ * @route   POST /match
  * @desc    Match user intent with available subgraphs
  * @access  Public
  */
@@ -30,7 +30,7 @@ matchRoutes.post('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/match
+ * @route   GET /match
  * @desc    Match user intent with available subgraphs (query params version)
  * @access  Public
  */

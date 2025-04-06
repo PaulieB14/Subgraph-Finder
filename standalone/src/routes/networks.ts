@@ -8,7 +8,7 @@ import { getNetworks } from '../services/graph-service.js';
 export const networkRoutes = express.Router();
 
 /**
- * @route   GET /api/networks
+ * @route   GET /networks
  * @desc    Get all networks
  * @access  Public
  */
