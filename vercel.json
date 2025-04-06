@@ -8,7 +8,7 @@
     { "source": "/simple", "destination": "/dashboard/simple-chat.html" },
     { "source": "/dashboard/chat", "destination": "/dashboard/chat.html" },
     { "source": "/dashboard/simple", "destination": "/dashboard/simple-chat.html" },
-    { "source": "/", "destination": "/dashboard/simple-chat.html" }
+    { "source": "/", "destination": "/dashboard/chat.html" }
   ],
   "headers": [
     {
@@ -17,7 +17,7 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.vercel.app" }
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.vercel.app https://*.thegraph.com https://gateway.thegraph.com https://api.thegraph.com https://*.googleapis.com https://generativelanguage.googleapis.com" }
       ]
     }
   ]
